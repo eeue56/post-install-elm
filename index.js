@@ -10,12 +10,12 @@ const remove = require("remove");
 
 
 
-const downloadZipball = (package, packageName, version) => {
+const downloadZipball = (root, package, packageName, version) => {
     return new Promise(function(resolve, reject){
         const user = packageName.split("/")[0];
         const name = packageName.split("/")[1];
-        const almostPlace = path.join("elm-stuff", "packages", packageName);
-        const place = path.join("elm-stuff", "packages", packageName, version);
+        const almostPlace = path.join(root, "elm-stuff", "packages", packageName);
+        const place = path.join(root, "elm-stuff", "packages", packageName, version);
 
         var inZipping = false;
         console.log('Installing', packageName, "at", version);
@@ -54,10 +54,10 @@ const downloadZipball = (package, packageName, version) => {
     });
 };
 
-const addToExactDependencies = (packageName, version) => {
+const addToExactDependencies = (root, packageName, version) => {
     return new Promise((resolve, reject) => {
         console.log('Adding to exact deps..');
-        const exactPath = path.join(process.cwd(), "elm-stuff", "exact-dependencies.json");
+        const exactPath = path.join(root, "elm-stuff", "exact-dependencies.json");
         var exactDeps = {}; 
 
         try {
@@ -80,9 +80,9 @@ const getUserHome = () => {
 };
 
 
-const copyElmPackage = (packageName, version) => {
+const copyElmPackage = (root, packageName, version) => {
     return new Promise((resolve, reject) => {
-        const elmPackagePath = path.join(process.cwd(), "elm-stuff/packages", packageName, version, "elm-package.json");
+        const elmPackagePath = path.join(root, "elm-stuff/packages", packageName, version, "elm-package.json");
         const currentElmPackage = require(elmPackagePath);
 
         var elmMajorVersion = currentElmPackage["elm-version"].split(" ")[0];
@@ -97,10 +97,10 @@ const copyElmPackage = (packageName, version) => {
     });
 };
 
-const addToElmPackage = (packageName, version) => {
+const addToElmPackage = (root, packageName, version) => {
     return new Promise((resolve, reject) => {
         console.log('Adding to dep to elm-package.json..');
-        const elmPackagePath = path.join(process.cwd(), "elm-package.json");
+        const elmPackagePath = path.join(root, "elm-package.json");
         var elmPackage = null;
         try {
             elmPackage = require(elmPackagePath);
@@ -115,20 +115,21 @@ const addToElmPackage = (packageName, version) => {
     });
 };
 
-const install = (package, version) => {
+const install = (package, version, root) => {
+    if (typeof root === "undefined" || root === null) root = process.cwd();
+
     const parts = package.split('/');
     const packageName = parts.slice(parts.length - 2).join("/");
 
     return new Promise(function(resolve){
-        downloadZipball(package, packageName, version)
-
+        downloadZipball(root, package, packageName, version)
             .then(() => {
-                return addToExactDependencies(packageName, version);
+                return addToExactDependencies(root, packageName, version);
             })
             .then(() => {
-                return copyElmPackage(packageName, version);
+                return copyElmPackage(root, packageName, version);
             })
-            .then(addToElmPackage(packageName, version))
+            .then(addToElmPackage(root, packageName, version))
             .then(resolve)
             .catch(function(err){
                 console.log('Err', err);
