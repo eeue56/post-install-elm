@@ -26,7 +26,6 @@ const downloadZipball = (package, packageName, version) => {
 		).on('error', function(err) {
 		})
 		.on('end', function() {
-			console.log('ended');
 			if (!inZipping){
 				resolve();
 			}
