@@ -19,5 +19,12 @@
   "bugs": {
     "url": "https://github.com/eeue56/post-install-elm/issues"
   },
-  "homepage": "https://github.com/eeue56/post-install-elm#readme"
+  "homepage": "https://github.com/eeue56/post-install-elm#readme",
+  "dependencies": {
+    "adm-zip": "^0.4.7",
+    "fs-extra": "^2.0.0",
+    "github-download": "^0.5.0",
+    "remove": "^0.1.5",
+    "request": "^2.79.0"
+  }
 }
